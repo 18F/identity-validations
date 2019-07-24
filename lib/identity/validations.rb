@@ -1,4 +1,6 @@
-require "identity/validations/version"
+# frozen_string_literal: true
+
+require 'identity/validations/version'
 
 module Identity
   module Validations
