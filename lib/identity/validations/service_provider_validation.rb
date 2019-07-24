@@ -41,12 +41,24 @@ module Identity
       end
 
       def saml_client_cert_is_x509_if_present
-        return if saml_client_cert.blank?
+        dashboard = respond_to?(:saml_client_cert)
+        if dashboard
+          _cert = saml_client_cert
+        else
+          file = Rails.root.join('certs', 'sp', "#{cert}.crt")
+
+          _cert = File.read(file) if file.exist?
+        end
+        return if _cert.blank?
 
         begin
-          OpenSSL::X509::Certificate.new(saml_client_cert)
+          OpenSSL::X509::Certificate.new(_cert)
         rescue OpenSSL::X509::CertificateError
-          errors.add(:saml_client_cert, :invalid)
+          if dashboard
+            errors.add(:saml_client_cert, :invalid)
+          else
+            errors.add(:cert, :invalid)
+          end
         end
       end
 
