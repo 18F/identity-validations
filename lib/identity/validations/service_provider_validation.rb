@@ -1,22 +1,20 @@
 # frozen_string_literal: true
 
-require 'active_support/concern'
-
 module Identity
   module Validations
     # Applies consistent validations to service providers
     module ServiceProviderValidation
-      extend ActiveSupport::Concern
+      def self.included(base)
+        base.class_eval do
+          validates :friendly_name, presence: true
+          validates :issuer, presence: true, uniqueness: true
+          validates :issuer, format: { with: ISSUER_FORMAT_REGEXP }, on: :create
+          validates :ial, inclusion: { in: [1, 2] }, allow_nil: true
 
-      included do
-        validates :friendly_name, presence: true
-        validates :issuer, presence: true, uniqueness: true
-        validates :issuer, format: { with: ISSUER_FORMAT_REGEXP }, on: :create
-        validates :ial, inclusion: { in: [1, 2] }, allow_nil: true
-
-        validate :redirect_uris_are_parsable
-        validate :failure_to_proof_url_is_parsable
-        validate :saml_client_cert_is_x509_if_present
+          validate :redirect_uris_are_parsable
+          validate :failure_to_proof_url_is_parsable
+          validate :saml_client_cert_is_x509_if_present
+        end
       end
 
       private
