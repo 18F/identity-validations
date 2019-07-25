@@ -1,4 +1,6 @@
-source "https://rubygems.org"
+# frozen_string_literal: true
 
-# Specify your gem's dependencies in identity-validations.gemspec
+source 'https://rubygems.org'
+
+# Specify your gem's dependencies in identity_validations.gemspec
 gemspec
