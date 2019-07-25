@@ -2,18 +2,18 @@
 
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'identity/validations/version'
-require 'identity/validations/service_provider_validation'
+require 'identity_validations/version'
+require 'identity_validations/service_provider_validation'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'identity-validations'
-  spec.version       = Identity::Validations::VERSION
+  spec.name          = 'identity_validations'
+  spec.version       = IdentityValidations::VERSION
   spec.authors       = ['Douglas Price']
   spec.email         = ['douglas.price@gsa.gov']
 
   spec.summary       = %q{Provide consistent validation between IDP and Dashboard models.}
   # spec.description = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = 'https://github.com/18F/identity-validations/blob/master/README.md'
+  spec.homepage      = 'https://github.com/18F/identity_validations/blob/master/README.md'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
@@ -21,8 +21,8 @@ Gem::Specification.new do |spec|
     spec.metadata['allowed_push_host'] = 'TODO: Set to "http://mygemserver.com"'
 
     spec.metadata['homepage_uri'] = spec.homepage
-    spec.metadata['source_code_uri'] = 'https://github.com/18F/identity-validations'
-    spec.metadata['changelog_uri'] = 'https://github.com/18F/identity-validations/blob/master/CHANGELOG.mdlas'
+    spec.metadata['source_code_uri'] = 'https://github.com/18F/identity_validations'
+    spec.metadata['changelog_uri'] = 'https://github.com/18F/identity_validations/blob/master/CHANGELOG.mdlas'
   else
     raise 'RubyGems 2.0 or newer is required to protect against public gem pushes.'
   end

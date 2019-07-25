@@ -1,4 +1,4 @@
-# Identity::Validations
+# IdentityValidations
 
 This gem provides validation modules for models that are duplicated in the [identity-idp][idp] and [identity-dashboard][dashboard] repositories. The goal is to provide a unified validation of shared models so that a valid instance in the dashboard is equally valid in the IDP.
 
@@ -10,7 +10,7 @@ This gem provides validation modules for models that are duplicated in the [iden
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'identity-validations', git: 'https://github.com/18F/identity-validations'
+gem 'identity_validations', github: '18F/identity_validations'
 ```
 
 And then execute:
@@ -23,7 +23,7 @@ For the models that currently have validation defined in this gem (e.g., Service
 
 ```ruby
 class ServiceProvider
-  include Identity::Validations::ServiceProviderValidation
+  include IdentityValidations::ServiceProviderValidation
   ...
 end
 ```
@@ -38,6 +38,6 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/18F/identity-validators. See [CONTRIBUTING][contributing] for details.
+Bug reports and pull requests are welcome on GitHub at https://github.com/18F/identity_validations. See [CONTRIBUTING][contributing] for details.
 
-[contributing]: https://github.com/18F/identity-validators/blob/master/CONTRIBUTING.md
+[contributing]: https://github.com/18F/identity_validations/blob/master/CONTRIBUTING.md

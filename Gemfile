@@ -2,5 +2,5 @@
 
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in identity-validations.gemspec
+# Specify your gem's dependencies in identity_validations.gemspec
 gemspec
