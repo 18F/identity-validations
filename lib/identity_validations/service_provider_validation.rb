@@ -12,6 +12,7 @@ module IdentityValidations
 
         validate :redirect_uris_are_parsable
         validate :failure_to_proof_url_is_parsable
+        validate :push_notification_url_is_parsable
         validate :saml_client_cert_is_x509_if_present
       end
     end
@@ -30,7 +31,7 @@ module IdentityValidations
 
       redirect_uris.each do |uri|
         next if uri_valid?(uri)
-        
+
         errors.add(:redirect_uris, :invalid)
         break
       end
@@ -38,8 +39,14 @@ module IdentityValidations
 
     def failure_to_proof_url_is_parsable
       return if failure_to_proof_url.blank?
-      
+
       errors.add(:failure_to_proof_url, :invalid) unless uri_valid?(failure_to_proof_url)
+    end
+
+    def push_notification_url_is_parsable
+      return if push_notification_url.blank?
+
+      errors.add(:push_notification_url, :invalid) unless uri_valid?(push_notification_url)
     end
 
     def saml_client_cert_is_x509_if_present
