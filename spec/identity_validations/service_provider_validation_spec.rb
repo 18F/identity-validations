@@ -63,11 +63,19 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
   end
 
   describe 'invalid service providers' do
-    context 'when the redirect_uris are invalid' do
+    context 'when the redirect_uris are not uris' do
       let(:redirect_uris) { ['foo'] }
       it 'invalidates a service provider with invalid redirect_uris' do
         service_provider.valid?
         expect(service_provider).not_to be_valid, 'SP should not valid due to invalid redirect_uri'
+      end
+    end
+
+    context 'when the redirect_uris are file uris' do
+      let(:redirect_uris) { ['file:///usr/sbin/evil_script.sh'] }
+      it 'invalidates a service provider with invalid redirect_uris' do
+        service_provider.valid?
+        expect(service_provider).not_to be_valid, 'SP should not valid due to file: redirect_uri'
       end
     end
   end

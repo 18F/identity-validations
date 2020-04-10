@@ -65,7 +65,7 @@ module IdentityValidations
     def uri_valid?(uri)
       parsed_uri = URI.parse(uri)
       return false unless parsed_uri.scheme.present?
-      /https?/ =~ parsed_uri.scheme ? parsed_uri.host.present? : true
+      /(https?|file)/ =~ parsed_uri.scheme ? parsed_uri.host.present? : true
     rescue URI::BadURIError, URI::InvalidURIError
       false
     end
