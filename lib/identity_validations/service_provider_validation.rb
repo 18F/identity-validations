@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'openssl'
 
 module IdentityValidations
   # Applies consistent validations to service providers
@@ -63,7 +64,8 @@ module IdentityValidations
 
     def uri_valid?(uri)
       parsed_uri = URI.parse(uri)
-      parsed_uri.scheme.present? && parsed_uri.host.present?
+      return false unless parsed_uri.scheme.present?
+      /https?/ =~ parsed_uri.scheme ? parsed_uri.host.present? : true
     rescue URI::BadURIError, URI::InvalidURIError
       false
     end
