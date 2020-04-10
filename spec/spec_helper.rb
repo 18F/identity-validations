@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
+require 'byebug'
 require 'identity_validations'
+require 'identity_validations/test_service_provider'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
