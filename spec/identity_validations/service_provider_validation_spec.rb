@@ -40,7 +40,7 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
     CERT
   end
   let(:service_provider) do
-    TestServiceProvider.new(
+    IdentityValidations::TestServiceProvider.new(
       friendly_name: friendly_name,
       issuer: issuer,
       ial: ial,
