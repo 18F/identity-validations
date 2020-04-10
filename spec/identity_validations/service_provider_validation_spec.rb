@@ -51,10 +51,24 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
     )
   end
 
-  it 'validates a valid service provider' do
+  before do
     allow_any_instance_of(ActiveRecord::Validations::UniquenessValidator).to receive(:validate_each).and_return(true)
+  end
 
-    service_provider.valid?
-    expect(service_provider).to be_valid, "SP not valid due to #{service_provider.errors.messages}"
+  describe 'valid service providers' do
+    it 'validates a valid service provider' do
+      service_provider.valid?
+      expect(service_provider).to be_valid, "SP not valid due to #{service_provider.errors.messages}"
+    end
+  end
+
+  describe 'invalid service providers' do
+    context 'when the redirect_uris are invalid' do
+      let(:redirect_uris) { ['foo'] }
+      it 'invalidates a service provider with invalid redirect_uris' do
+        service_provider.valid?
+        expect(service_provider).not_to be_valid, 'SP should not valid due to invalid redirect_uri'
+      end
+    end
   end
 end
