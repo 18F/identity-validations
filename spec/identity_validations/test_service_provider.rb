@@ -13,7 +13,13 @@ module IdentityValidations
     include ::ActiveRecord::Validations
     include IdentityValidations::ServiceProviderValidation
 
-    attr_accessor :friendly_name, :issuer, :ial, :redirect_uris, :failure_to_proof_url, :push_notification_url, :saml_client_cert
+    attr_accessor :friendly_name,
+                  :issuer,
+                  :ial,
+                  :redirect_uris,
+                  :failure_to_proof_url,
+                  :push_notification_url,
+                  :saml_client_cert
 
     def initialize(**args)
       super
