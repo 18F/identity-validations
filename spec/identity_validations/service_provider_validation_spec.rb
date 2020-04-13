@@ -13,7 +13,7 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
   end
   let(:failure_to_proof_url) { 'https://example.com/failure_to_proof' }
   let(:push_notification_url) { 'https://example.com/push_notification' }
-  let(:nil_cert) { "" }
+  let(:nil_cert) { '' }
   let(:test_cert) do
     <<~CERT.strip
       -----BEGIN CERTIFICATE-----
@@ -39,7 +39,7 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
       -----END CERTIFICATE-----`
     CERT
   end
-  let(:service_provider) do
+  let(:sp) do
     IdentityValidations::TestServiceProvider.new(
       friendly_name: friendly_name,
       issuer: issuer,
@@ -52,13 +52,14 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
   end
 
   before do
-    allow_any_instance_of(ActiveRecord::Validations::UniquenessValidator).to receive(:validate_each).and_return(true)
+    allow_any_instance_of(ActiveRecord::Validations::UniquenessValidator)
+      .to receive(:validate_each).and_return(true)
   end
 
   describe 'valid service providers' do
     it 'validates a valid service provider' do
-      service_provider.valid?
-      expect(service_provider).to be_valid, "SP not valid due to #{service_provider.errors.messages}"
+      sp.valid?
+      expect(sp).to be_valid, "SP not valid due to #{sp.errors.messages}"
     end
   end
 
@@ -66,40 +67,40 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
     context 'when the redirect_uris are not uris' do
       let(:redirect_uris) { ['foo'] }
       it 'invalidates a service provider with invalid redirect_uris' do
-        service_provider.valid?
-        expect(service_provider).not_to be_valid, 'SP should not valid due to invalid redirect_uri'
+        sp.valid?
+        expect(sp).not_to be_valid, 'SP should not valid due to invalid redirect_uri'
       end
     end
 
     context 'when the redirect_uris are file uris' do
       let(:redirect_uris) { ['file:///usr/sbin/evil_script.sh'] }
       it 'invalidates a service provider with file redirect_uris' do
-        service_provider.valid?
-        expect(service_provider).not_to be_valid, 'SP should not valid due to file: redirect_uri'
+        sp.valid?
+        expect(sp).not_to be_valid, 'SP should not valid due to file: redirect_uri'
       end
     end
 
     context 'when the redirect_uris are ftp uris' do
       let(:redirect_uris) { ['ftp://user@password:example.com/usr/sbin/evil_script.sh'] }
       it 'invalidates a service provider with ftp redirect_uris' do
-        service_provider.valid?
-        expect(service_provider).not_to be_valid, 'SP should not valid due to ftp: redirect_uri'
+        sp.valid?
+        expect(sp).not_to be_valid, 'SP should not valid due to ftp: redirect_uri'
       end
     end
 
     context 'when the redirect_uris are mailto uris' do
       let(:redirect_uris) { ['mailto:sally@example.com?subject=Invalid'] }
       it 'invalidates a service provider with mailto redirect_uris' do
-        service_provider.valid?
-        expect(service_provider).not_to be_valid, 'SP should not valid due to mailto: redirect_uri'
+        sp.valid?
+        expect(sp).not_to be_valid, 'SP should not valid due to mailto: redirect_uri'
       end
     end
 
     context 'when the redirect_uris are ldap uris' do
       let(:redirect_uris) { ['ldap://ldap.example.com/dc=example;dc=com?query'] }
       it 'invalidates a service provider with ldap redirect_uris' do
-        service_provider.valid?
-        expect(service_provider).not_to be_valid, 'SP should not valid due to ldap: redirect_uri'
+        sp.valid?
+        expect(sp).not_to be_valid, 'SP should not valid due to ldap: redirect_uri'
       end
     end
   end

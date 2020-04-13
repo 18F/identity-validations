@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'openssl'
 
 module IdentityValidations
@@ -72,11 +73,11 @@ module IdentityValidations
     end
 
     def unsupported_uri?(uri)
-      !! (/\A(s?ftp|ldaps?|file|mailto)/ =~ uri.scheme)
+      !!(/\A(s?ftp|ldaps?|file|mailto)/ =~ uri.scheme)
     end
 
     def web_uri?(uri)
-      !! (/\Ahttps?/ =~ uri.scheme && uri.host.present?)
+      !!(/\Ahttps?/ =~ uri.scheme && uri.host.present?)
     end
 
     # Not a strict definition of native uri, but a catch-all
