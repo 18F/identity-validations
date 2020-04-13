@@ -64,10 +64,25 @@ module IdentityValidations
 
     def uri_valid?(uri)
       parsed_uri = URI.parse(uri)
-      return false unless parsed_uri.scheme.present?
-      /(https?|file)/ =~ parsed_uri.scheme ? parsed_uri.host.present? : true
+      return false if unsupported_uri?(parsed_uri)
+
+      web_uri?(parsed_uri) || native_uri?(parsed_uri)
     rescue URI::BadURIError, URI::InvalidURIError
       false
+    end
+
+    def unsupported_uri?(uri)
+      !! (/\A(s?ftp|ldaps?|file|mailto)/ =~ uri.scheme)
+    end
+
+    def web_uri?(uri)
+      !! (/\Ahttps?/ =~ uri.scheme && uri.host.present?)
+    end
+
+    # Not a strict definition of native uri, but a catch-all
+    # to ensure we have the bare minimum
+    def native_uri?(uri)
+      uri.scheme.present? && uri.path.present?
     end
 
     def get_certificate(dashboard)

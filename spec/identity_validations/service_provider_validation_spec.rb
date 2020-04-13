@@ -73,9 +73,33 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
 
     context 'when the redirect_uris are file uris' do
       let(:redirect_uris) { ['file:///usr/sbin/evil_script.sh'] }
-      it 'invalidates a service provider with invalid redirect_uris' do
+      it 'invalidates a service provider with file redirect_uris' do
         service_provider.valid?
         expect(service_provider).not_to be_valid, 'SP should not valid due to file: redirect_uri'
+      end
+    end
+
+    context 'when the redirect_uris are ftp uris' do
+      let(:redirect_uris) { ['ftp://user@password:example.com/usr/sbin/evil_script.sh'] }
+      it 'invalidates a service provider with ftp redirect_uris' do
+        service_provider.valid?
+        expect(service_provider).not_to be_valid, 'SP should not valid due to ftp: redirect_uri'
+      end
+    end
+
+    context 'when the redirect_uris are mailto uris' do
+      let(:redirect_uris) { ['mailto:sally@example.com?subject=Invalid'] }
+      it 'invalidates a service provider with mailto redirect_uris' do
+        service_provider.valid?
+        expect(service_provider).not_to be_valid, 'SP should not valid due to mailto: redirect_uri'
+      end
+    end
+
+    context 'when the redirect_uris are ldap uris' do
+      let(:redirect_uris) { ['ldap://ldap.example.com/dc=example;dc=com?query'] }
+      it 'invalidates a service provider with ldap redirect_uris' do
+        service_provider.valid?
+        expect(service_provider).not_to be_valid, 'SP should not valid due to ldap: redirect_uri'
       end
     end
   end
