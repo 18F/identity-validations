@@ -67,7 +67,7 @@ module IdentityValidations
       parsed_uri = URI.parse(uri)
       return false if unsupported_uri?(parsed_uri)
 
-      web_uri?(parsed_uri) || native_uri?(parsed_uri)
+      web_uri?(parsed_uri) || native_uri?(parsed_uri) || custom_uri?(parsed_uri)
     rescue URI::BadURIError, URI::InvalidURIError
       false
     end
@@ -84,6 +84,10 @@ module IdentityValidations
     # to ensure we have the bare minimum
     def native_uri?(uri)
       uri.scheme.present? && uri.path.present?
+    end
+
+    def custom_uri?(uri)
+      uri.scheme.present? && uri.host.present?
     end
 
     def get_certificate(dashboard)

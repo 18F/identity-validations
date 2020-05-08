@@ -8,7 +8,8 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
     [
       'http://example.com/redirect1',
       'https://example.com/redirect2',
-      'example-app:/redirect3'
+      'example-app:/redirect3',
+      'example.app.com://redirect4'
     ]
   end
   let(:failure_to_proof_url) { 'https://example.com/failure_to_proof' }
