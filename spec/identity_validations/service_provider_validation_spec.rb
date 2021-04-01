@@ -37,9 +37,10 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
       Gr110oP+s2JEvONEMrLHVDF8V5d/oU8x8Tf7e/aSDvjkjJJzuDwCzR5ehifPuuS+
       7idgHDOzQXqcWItiXzDGKDZ+lwFdKfnzxYQOTU1kFFb5eolUjU6yL6VTZSypwKuN
       QoA63AC0m/h75svOH1rAqHMQLXif1+QVl1B/E9HtcUy8ql1apkiaq2O91EpNr9JY
-      -----END CERTIFICATE-----`
+      -----END CERTIFICATE-----
     CERT
   end
+  let(:certs) { [nil_cert] }
   let(:sp) do
     IdentityValidations::TestServiceProvider.new(
       friendly_name: friendly_name,
@@ -48,7 +49,7 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
       redirect_uris: redirect_uris,
       failure_to_proof_url: failure_to_proof_url,
       push_notification_url: push_notification_url,
-      saml_client_cert: nil_cert
+      certs: certs
     )
   end
 
@@ -102,6 +103,55 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
       it 'invalidates a service provider with ldap redirect_uris' do
         sp.valid?
         expect(sp).not_to be_valid, 'SP should not valid due to ldap: redirect_uri'
+      end
+    end
+  end
+
+  describe 'validating certs' do
+    context 'with a blank cert' do
+      let(:certs) { [''] }
+      it { expect(sp).to be_valid }
+    end
+
+    context 'with a good cert' do
+      let(:certs) { [test_cert] }
+      it { expect(sp).to be_valid }
+    end
+
+    context 'with a good cert and a bad cert' do
+      let(:certs) { [test_cert, 'i-am-a-bad-cert'] }
+      it { expect(sp).to_not be_valid }
+    end
+
+    context 'inside Rails' do
+      let(:certs) { ['filename'] }
+      let(:file_exists) { false }
+
+      let(:pathname) { Pathname.new('filename') }
+
+      before do
+        stub_const('Rails', double('Rails'))
+        allow(Rails).to receive_message_chain(:root, :join).with('certs', 'sp', 'filename.crt').
+          and_return(pathname)
+
+        allow(File).to receive(:exist?).with(pathname).and_return(file_exists)
+      end
+
+      context 'with a file that exists' do
+        let(:file_exists) { true }
+
+        before do
+          allow(pathname).to receive(:read).and_return(test_cert)
+        end
+
+        it { expect(sp).to be_valid }
+      end
+
+      context 'with a file that does not exist' do
+        let(:file_exists) { false }
+        it 'is valid and does not try to read the file' do
+          expect(sp).to be_valid
+        end
       end
     end
   end

@@ -19,7 +19,7 @@ module IdentityValidations
                   :redirect_uris,
                   :failure_to_proof_url,
                   :push_notification_url,
-                  :saml_client_cert
+                  :certs
 
     def initialize(**args)
       super

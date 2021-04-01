@@ -15,7 +15,7 @@ module IdentityValidations
         validate :redirect_uris_are_parsable
         validate :failure_to_proof_url_is_parsable
         validate :push_notification_url_is_parsable
-        validate :saml_client_cert_is_x509_if_present
+        validate :certs_are_x509_if_present
       end
     end
 
@@ -51,15 +51,13 @@ module IdentityValidations
       errors.add(:push_notification_url, :invalid) unless uri_valid?(push_notification_url)
     end
 
-    def saml_client_cert_is_x509_if_present
-      dashboard = respond_to?(:saml_client_cert)
-      certificate = get_certificate(dashboard)
-      return if certificate.blank?
-
-      begin
-        OpenSSL::X509::Certificate.new(certificate)
+    def certs_are_x509_if_present
+      Array(certs).each do |cert|
+        content = cert_content(cert)
+        next if content.blank?
+        OpenSSL::X509::Certificate.new(content)
       rescue OpenSSL::X509::CertificateError
-        flag_cert_invalid(dashboard)
+        errors.add(:certs, :invalid)
       end
     end
 
@@ -90,21 +88,14 @@ module IdentityValidations
       uri.scheme.present? && uri.host.present?
     end
 
-    def get_certificate(dashboard)
-      if dashboard
-        saml_client_cert
-      else
+    def cert_content(cert)
+      all_printable_chars = /\A[[:print:]]+\Z/.match?(cert)
+
+      if all_printable_chars && defined?(Rails)
         file = Rails.root.join('certs', 'sp', "#{cert}.crt")
-
-        File.read(file) if file.exist?
-      end
-    end
-
-    def flag_cert_invalid(dashboard)
-      if dashboard
-        errors.add(:saml_client_cert, :invalid)
+        File.exist?(file) && file.read
       else
-        errors.add(:cert, :invalid)
+        cert
       end
     end
   end
