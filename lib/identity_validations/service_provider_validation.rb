@@ -53,13 +53,8 @@ module IdentityValidations
 
     def certs_are_x509_if_present
       Array(certs).each do |cert|
-        file = defined?(Rails) && Rails.root.join('certs', 'sp', "#{cert}.crt")
-
-        content = file&.exist? ? file.read : cert
-
-        next if content.blank?
-
-        OpenSSL::X509::Certificate.new(content)
+        next if cert.blank?
+        OpenSSL::X509::Certificate.new(cert_content(cert))
       rescue OpenSSL::X509::CertificateError
         errors.add(:certs, :invalid)
       end
@@ -90,6 +85,17 @@ module IdentityValidations
 
     def custom_uri?(uri)
       uri.scheme.present? && uri.host.present?
+    end
+
+    def cert_content(cert)
+      all_printable_chars = /\A[[:print:]]+\Z/.match?(cert)
+
+      if all_printable_chars && defined?(Rails)
+        file = Rails.root.join('certs', 'sp', "#{cert}.crt")
+        File.exist?(file) && file.read
+      else
+        cert
+      end
     end
   end
 end
