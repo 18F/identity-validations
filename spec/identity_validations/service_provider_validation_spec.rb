@@ -108,6 +108,11 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
   end
 
   describe 'validating certs' do
+    context 'with a blank cert' do
+      let(:certs) { [''] }
+      it { expect(sp).to be_valid }
+    end
+
     context 'with a good cert' do
       let(:certs) { [test_cert] }
       it { expect(sp).to be_valid }
@@ -116,6 +121,38 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
     context 'with a good cert and a bad cert' do
       let(:certs) { [test_cert, 'i-am-a-bad-cert'] }
       it { expect(sp).to_not be_valid }
+    end
+
+    context 'inside Rails' do
+      let(:certs) { ['filename'] }
+      let(:file_exists) { false }
+
+      let(:pathname) { Pathname.new('filename') }
+
+      before do
+        stub_const('Rails', double('Rails'))
+        allow(Rails).to receive_message_chain(:root, :join).with('certs', 'sp', 'filename.crt').
+          and_return(pathname)
+
+        allow(File).to receive(:exist?).with(pathname).and_return(file_exists)
+      end
+
+      context 'with a file that exists' do
+        let(:file_exists) { true }
+
+        before do
+          allow(pathname).to receive(:read).and_return(test_cert)
+        end
+
+        it { expect(sp).to be_valid }
+      end
+
+      context 'with a file that does not exist' do
+        let(:file_exists) { false }
+        it 'is valid and does not try to read the file' do
+          expect(sp).to be_valid
+        end
+      end
     end
   end
 end

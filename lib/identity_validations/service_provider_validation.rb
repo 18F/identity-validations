@@ -53,8 +53,9 @@ module IdentityValidations
 
     def certs_are_x509_if_present
       Array(certs).each do |cert|
-        next if cert.blank?
-        OpenSSL::X509::Certificate.new(cert_content(cert))
+        content = cert_content(cert)
+        next if content.blank?
+        OpenSSL::X509::Certificate.new(content)
       rescue OpenSSL::X509::CertificateError
         errors.add(:certs, :invalid)
       end
