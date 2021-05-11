@@ -1,19 +1,23 @@
 # frozen_string_literal: true
 
-RSpec.describe IdentityValidations::ServiceProviderValidation do
-  let(:friendly_name) { 'Test SP' }
-  let(:issuer) { 'test_issuer' }
-  let(:ial) { 1 }
-  let(:redirect_uris) do
+require 'spec_helper'
+require 'securerandom'
+
+RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
+  let(:valid_urls) { %w[https://example.com https://example.gov/foo app.example.gov://bar] }
+  let(:invalid_urls) do
     [
-      'http://example.com/redirect1',
-      'https://example.com/redirect2',
-      'example-app:/redirect3',
-      'example.app.com://redirect4'
+      'not_a_url',
+      'http://this has spaces',
+      'foo.com',
+      '/foo/bar',
+      'foo.com:result',
+      'file:///usr/sbin/evil_script.sh',
+      'ftp://user@password:example.com/usr/sbin/evil_script.sh',
+      'mailto:sally@example.com?subject=Invalid',
+      'ldap://ldap.example.com/dc=example;dc=com?query'
     ]
   end
-  let(:failure_to_proof_url) { 'https://example.com/failure_to_proof' }
-  let(:push_notification_url) { 'https://example.com/push_notification' }
   let(:nil_cert) { '' }
   let(:test_cert) do
     <<~CERT.strip
@@ -41,86 +45,44 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
     CERT
   end
   let(:certs) { [nil_cert] }
-  let(:sp) do
+
+  subject do
     IdentityValidations::TestServiceProvider.new(
-      friendly_name: friendly_name,
-      issuer: issuer,
-      ial: ial,
-      redirect_uris: redirect_uris,
-      failure_to_proof_url: failure_to_proof_url,
-      push_notification_url: push_notification_url,
+      issuer: SecureRandom.hex(8),
+      friendly_name: SecureRandom.hex(8),
       certs: certs
     )
   end
 
-  before do
-    allow_any_instance_of(ActiveRecord::Validations::UniquenessValidator)
-      .to receive(:validate_each).and_return(true)
+  it { is_expected.to validate_presence_of(:friendly_name) }
+  it { is_expected.to validate_presence_of(:issuer) }
+  it do
+    is_expected.to \
+      allow_value('this:is:an:issuer', 'https://another.issuer').for(:issuer).on(:create)
   end
-
-  describe 'valid service providers' do
-    it 'validates a valid service provider' do
-      sp.valid?
-      expect(sp).to be_valid, "SP not valid due to #{sp.errors.messages}"
-    end
-  end
-
-  describe 'invalid service providers' do
-    context 'when the redirect_uris are not uris' do
-      let(:redirect_uris) { ['foo'] }
-      it 'invalidates a service provider with invalid redirect_uris' do
-        sp.valid?
-        expect(sp).not_to be_valid, 'SP should not valid due to invalid redirect_uri'
-      end
-    end
-
-    context 'when the redirect_uris are file uris' do
-      let(:redirect_uris) { ['file:///usr/sbin/evil_script.sh'] }
-      it 'invalidates a service provider with file redirect_uris' do
-        sp.valid?
-        expect(sp).not_to be_valid, 'SP should not valid due to file: redirect_uri'
-      end
-    end
-
-    context 'when the redirect_uris are ftp uris' do
-      let(:redirect_uris) { ['ftp://user@password:example.com/usr/sbin/evil_script.sh'] }
-      it 'invalidates a service provider with ftp redirect_uris' do
-        sp.valid?
-        expect(sp).not_to be_valid, 'SP should not valid due to ftp: redirect_uri'
-      end
-    end
-
-    context 'when the redirect_uris are mailto uris' do
-      let(:redirect_uris) { ['mailto:sally@example.com?subject=Invalid'] }
-      it 'invalidates a service provider with mailto redirect_uris' do
-        sp.valid?
-        expect(sp).not_to be_valid, 'SP should not valid due to mailto: redirect_uri'
-      end
-    end
-
-    context 'when the redirect_uris are ldap uris' do
-      let(:redirect_uris) { ['ldap://ldap.example.com/dc=example;dc=com?query'] }
-      it 'invalidates a service provider with ldap redirect_uris' do
-        sp.valid?
-        expect(sp).not_to be_valid, 'SP should not valid due to ldap: redirect_uri'
-      end
-    end
-  end
+  it { is_expected.not_to allow_value('issuer with space').for(:issuer).on(:create) }
+  it { is_expected.to validate_inclusion_of(:ial).in_array([1, 2]).allow_nil }
+  it { is_expected.to allow_value(valid_urls, [], nil).for(:redirect_uris) }
+  it { is_expected.not_to allow_value(invalid_urls).for(:redirect_uris) }
+  it { is_expected.to allow_value(*valid_urls, nil).for(:failure_to_proof_url) }
+  it { is_expected.not_to allow_value(*invalid_urls).for(:failure_to_proof_url) }
+  it { is_expected.to allow_value(*valid_urls, nil).for(:push_notification_url) }
+  it { is_expected.not_to allow_value(*invalid_urls).for(:push_notification_url) }
 
   describe 'validating certs' do
     context 'with a blank cert' do
       let(:certs) { [''] }
-      it { expect(sp).to be_valid }
+      it { expect(subject).to be_valid }
     end
 
     context 'with a good cert' do
       let(:certs) { [test_cert] }
-      it { expect(sp).to be_valid }
+      it { expect(subject).to be_valid }
     end
 
     context 'with a good cert and a bad cert' do
       let(:certs) { [test_cert, 'i-am-a-bad-cert'] }
-      it { expect(sp).to_not be_valid }
+      it { expect(subject).to_not be_valid }
     end
 
     context 'inside Rails' do
@@ -144,13 +106,13 @@ RSpec.describe IdentityValidations::ServiceProviderValidation do
           allow(pathname).to receive(:read).and_return(test_cert)
         end
 
-        it { expect(sp).to be_valid }
+        it { expect(subject).to be_valid }
       end
 
       context 'with a file that does not exist' do
         let(:file_exists) { false }
         it 'is valid and does not try to read the file' do
-          expect(sp).to be_valid
+          expect(subject).to be_valid
         end
       end
     end
