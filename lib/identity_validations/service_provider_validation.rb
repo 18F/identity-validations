@@ -55,9 +55,10 @@ module IdentityValidations
       Array(certs).each do |cert|
         content = cert_content(cert)
         next if content.blank?
+
         OpenSSL::X509::Certificate.new(content)
-      rescue OpenSSL::X509::CertificateError
-        errors.add(:certs, :invalid)
+      rescue OpenSSL::X509::CertificateError => e
+        errors.add(:certs, "#{cert} is invalid - #{e.message}")
       end
     end
 

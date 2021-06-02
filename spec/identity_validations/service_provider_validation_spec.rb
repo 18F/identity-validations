@@ -44,6 +44,7 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
       -----END CERTIFICATE-----
     CERT
   end
+  let(:invalid_cert) { 'not valid cert content' }
   let(:certs) { [nil_cert] }
 
   subject do
@@ -86,14 +87,14 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
     end
 
     context 'inside Rails' do
-      let(:certs) { ['filename'] }
+      let(:certs) { ['cert_file'] }
       let(:file_exists) { false }
 
-      let(:pathname) { Pathname.new('filename') }
+      let(:pathname) { Pathname.new('cert_file') }
 
       before do
         stub_const('Rails', double('Rails'))
-        allow(Rails).to receive_message_chain(:root, :join).with('certs', 'sp', 'filename.crt').
+        allow(Rails).to receive_message_chain(:root, :join).with('certs', 'sp', 'cert_file.crt').
           and_return(pathname)
 
         allow(File).to receive(:exist?).with(pathname).and_return(file_exists)
@@ -113,6 +114,22 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
         let(:file_exists) { false }
         it 'is valid and does not try to read the file' do
           expect(subject).to be_valid
+        end
+      end
+
+      context 'wth an invalid file' do
+        let(:file_exists) { true }
+
+        before do
+          allow(pathname).to receive(:read).and_return(invalid_cert)
+        end
+
+        it { expect(subject).not_to be_valid }
+
+        it 'includes the cert filename in the error message' do
+          subject.valid?
+          cert_errors = subject.errors[:certs].join(' ')
+          expect(cert_errors).to include('cert_file')
         end
       end
     end
