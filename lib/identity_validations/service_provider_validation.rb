@@ -32,7 +32,7 @@ module IdentityValidations
       return if redirect_uris.blank?
 
       redirect_uris.each do |uri|
-        next if uri_valid?(uri)
+        next if uri_valid?(uri) || uri_custom_scheme_only?(uri)
 
         errors.add(:redirect_uris, :invalid)
         break
@@ -67,6 +67,15 @@ module IdentityValidations
       return false if unsupported_uri?(parsed_uri)
 
       web_uri?(parsed_uri) || native_uri?(parsed_uri) || custom_uri?(parsed_uri)
+    rescue URI::BadURIError, URI::InvalidURIError
+      false
+    end
+
+    def uri_custom_scheme_only?(uri)
+      parsed_uri = URI.parse(uri)
+      return false if /\Ahttps?/ =~ parsed_uri.scheme
+
+      parsed_uri.scheme.present?
     rescue URI::BadURIError, URI::InvalidURIError
       false
     end

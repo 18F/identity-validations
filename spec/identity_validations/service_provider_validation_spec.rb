@@ -63,8 +63,8 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
   end
   it { is_expected.not_to allow_value('issuer with space').for(:issuer).on(:create) }
   it { is_expected.to validate_inclusion_of(:ial).in_array([1, 2]).allow_nil }
-  it { is_expected.to allow_value(valid_urls, [], nil).for(:redirect_uris) }
-  it { is_expected.not_to allow_value(invalid_urls).for(:redirect_uris) }
+  it { is_expected.to allow_value(valid_urls << 'random.scheme:', [], nil).for(:redirect_uris) }
+  it { is_expected.not_to allow_value(invalid_urls << 'https:').for(:redirect_uris) }
   it { is_expected.to allow_value(*valid_urls, nil).for(:failure_to_proof_url) }
   it { is_expected.not_to allow_value(*invalid_urls).for(:failure_to_proof_url) }
   it { is_expected.to allow_value(*valid_urls, nil).for(:push_notification_url) }
