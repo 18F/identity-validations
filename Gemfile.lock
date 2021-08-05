@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    identity_validations (0.6.0)
+    identity_validations (0.7.0)
 
 GEM
   remote: https://rubygems.org/
