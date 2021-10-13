@@ -51,11 +51,13 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
     IdentityValidations::TestServiceProvider.new(
       issuer: SecureRandom.hex(8),
       friendly_name: SecureRandom.hex(8),
+      return_to_sp_url: SecureRandom.hex(8),
       certs: certs
     )
   end
 
   it { is_expected.to validate_presence_of(:friendly_name) }
+  it { is_expected.to validate_presence_of(:return_to_sp_url) }
   it { is_expected.to validate_presence_of(:issuer) }
   it do
     is_expected.to \

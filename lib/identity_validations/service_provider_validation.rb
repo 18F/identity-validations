@@ -8,6 +8,7 @@ module IdentityValidations
     def self.included(base)
       base.class_eval do
         validates :friendly_name, presence: true
+        validates :return_to_sp_url, presence: true
         validates :issuer, presence: true, uniqueness: true
         validates :issuer, format: { with: ISSUER_FORMAT_REGEXP }, on: :create
         validates :ial, inclusion: { in: [1, 2] }, allow_nil: true

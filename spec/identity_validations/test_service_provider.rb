@@ -20,6 +20,7 @@ ActiveRecord::Schema.define do
     t.text 'failure_to_proof_url'
     t.string 'push_notification_url'
     t.string 'certs'
+    t.string 'return_to_sp_url'
   end
 end
 
