@@ -73,6 +73,7 @@ module IdentityValidations
 
     def uri_custom_scheme_only?(uri)
       parsed_uri = URI.parse(uri)
+      return false if unsupported_uri?(parsed_uri)
       return false if /\Ahttps?/ =~ parsed_uri.scheme
 
       parsed_uri.scheme.present?
