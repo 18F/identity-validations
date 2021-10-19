@@ -11,7 +11,6 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
       'http://this has spaces',
       'foo.com',
       '/foo/bar',
-      'foo.com:result',
       'file:///usr/sbin/evil_script.sh',
       'ftp://user@password:example.com/usr/sbin/evil_script.sh',
       'mailto:sally@example.com?subject=Invalid',
@@ -63,8 +62,14 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
   end
   it { is_expected.not_to allow_value('issuer with space').for(:issuer).on(:create) }
   it { is_expected.to validate_inclusion_of(:ial).in_array([1, 2]).allow_nil }
-  it { is_expected.to allow_value(valid_urls << 'random.scheme:', [], nil).for(:redirect_uris) }
-  it { is_expected.not_to allow_value(invalid_urls << 'https:').for(:redirect_uris) }
+  it { is_expected.to allow_value((valid_urls << 'random.scheme:'), [], nil).for(:redirect_uris) }
+  it 'correctly validates redirect_uris' do
+    (invalid_urls << 'https:').each do |url|
+      # check individually since the group would be negated by any one invalid
+      # value
+      expect(subject).not_to allow_value([url]).for(:redirect_uris)
+    end
+  end
   it { is_expected.to allow_value(*valid_urls, nil).for(:failure_to_proof_url) }
   it { is_expected.not_to allow_value(*invalid_urls).for(:failure_to_proof_url) }
   it { is_expected.to allow_value(*valid_urls, nil).for(:push_notification_url) }
