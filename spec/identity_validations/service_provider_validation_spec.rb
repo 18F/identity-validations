@@ -74,6 +74,10 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
   it { is_expected.not_to allow_value(*invalid_urls).for(:failure_to_proof_url) }
   it { is_expected.to allow_value(*valid_urls, nil).for(:push_notification_url) }
   it { is_expected.not_to allow_value(*invalid_urls).for(:push_notification_url) }
+  it { is_expected.to allow_value(*valid_urls, nil).for(:acs_url) }
+  it { is_expected.not_to allow_value(*invalid_urls).for(:acs_url) }
+  it { is_expected.to allow_value(*valid_urls, nil).for(:assertion_consumer_logout_service_url) }
+  it { is_expected.not_to allow_value(*invalid_urls).for(:assertion_consumer_logout_service_url) }
 
   describe 'validating certs' do
     context 'with a blank cert' do
