@@ -16,6 +16,8 @@ module IdentityValidations
         validate :failure_to_proof_url_is_parsable
         validate :push_notification_url_is_parsable
         validate :certs_are_x509_if_present
+        validate :acs_url_is_parsable
+        validate :assertion_consumer_logout_service_url_is_parsable
       end
     end
 
@@ -49,6 +51,19 @@ module IdentityValidations
       return if push_notification_url.blank?
 
       errors.add(:push_notification_url, :invalid) unless uri_valid?(push_notification_url)
+    end
+
+    def acs_url_is_parsable
+      return if acs_url.blank? || uri_valid?(acs_url)
+
+      errors.add(:acs_url, :invalid)
+    end
+
+    def assertion_consumer_logout_service_url_is_parsable
+      return if assertion_consumer_logout_service_url.blank? ||
+        uri_valid?(assertion_consumer_logout_service_url)
+
+      errors.add(:assertion_consumer_logout_service_url, :invalid)
     end
 
     def certs_are_x509_if_present
