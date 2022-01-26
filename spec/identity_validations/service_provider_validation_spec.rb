@@ -17,20 +17,6 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
       'ldap://ldap.example.com/dc=example;dc=com?query'
     ]
   end
-  let(:invalid_redirect_urls) do
-    [
-      'not_a_url',
-      'http://this has spaces',
-      'foo.com',
-      '/foo/bar',
-      'file:///usr/sbin/evil_script.sh',
-      'ftp://user@password:example.com/usr/sbin/evil_script.sh',
-      'mailto:sally@example.com?subject=Invalid',
-      'ldap://ldap.example.com/dc=example;dc=com?query',
-      'https:*',
-      'https://app.me/*'
-    ]
-  end
   let(:nil_cert) { '' }
   let(:test_cert) do
     <<~CERT.strip
@@ -78,7 +64,7 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
   it { is_expected.to validate_inclusion_of(:ial).in_array([1, 2]).allow_nil }
   it { is_expected.to allow_value((valid_urls << 'random.scheme:'), [], nil).for(:redirect_uris) }
   it 'correctly validates redirect_uris' do
-    (invalid_redirect_urls << 'https:').each do |url|
+    (invalid_urls << %w[https: https://* https://app.me/*]).each do |url|
       # check individually since the group would be negated by any one invalid
       # value
       expect(subject).not_to allow_value([url]).for(:redirect_uris)
