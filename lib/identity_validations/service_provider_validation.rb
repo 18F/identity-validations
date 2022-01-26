@@ -12,7 +12,7 @@ module IdentityValidations
         validates :issuer, format: { with: ISSUER_FORMAT_REGEXP }, on: :create
         validates :ial, inclusion: { in: [1, 2] }, allow_nil: true
 
-        validate :redirect_uris_are_parsable
+        validate :redirect_uris_are_valid
         validate :failure_to_proof_url_is_parsable
         validate :push_notification_url_is_parsable
         validate :certs_are_x509_if_present
@@ -30,11 +30,11 @@ module IdentityValidations
     #         we just enforce uniqueness, without whitespace.
     ISSUER_FORMAT_REGEXP = /\A[\S]+\z/.freeze
 
-    def redirect_uris_are_parsable
+    def redirect_uris_are_valid
       return if redirect_uris.blank?
 
       redirect_uris.each do |uri|
-        next if uri_valid?(uri) || uri_custom_scheme_only?(uri)
+        next if !uri.include?('*') && (uri_valid?(uri) || uri_custom_scheme_only?(uri))
 
         errors.add(:redirect_uris, :invalid)
         break
