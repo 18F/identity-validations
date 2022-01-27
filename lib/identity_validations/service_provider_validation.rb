@@ -34,11 +34,11 @@ module IdentityValidations
       return if redirect_uris.blank?
 
       redirect_uris.each do |uri|
-        next if !uri.include?('*') && (uri_valid?(uri) || uri_custom_scheme_only?(uri))
-
-        errors.add(:redirect_uris, :invalid)
-        break
+        errors.add(:redirect_uris, "#{uri} contains invalid wildcards(*)") if uri.include?('*')
+        errors.add(:redirect_uris, "#{uri} is not a valid URI") if !uri_valid?(uri) && !uri_custom_scheme_only?(uri)
       end
+
+      return errors[:redirect_uris].empty?
     end
 
     def failure_to_proof_url_is_parsable
