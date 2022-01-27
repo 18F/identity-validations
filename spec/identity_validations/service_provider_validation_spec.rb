@@ -63,11 +63,18 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
   it { is_expected.not_to allow_value('issuer with space').for(:issuer).on(:create) }
   it { is_expected.to validate_inclusion_of(:ial).in_array([1, 2]).allow_nil }
   it { is_expected.to allow_value((valid_urls << 'random.scheme:'), [], nil).for(:redirect_uris) }
-  it 'correctly validates redirect_uris' do
-    (invalid_urls << %w[https: https://* https://app.me/*]).each do |url|
+  it 'correctly validates invalid redirect_uris' do
+    (invalid_urls << 'https:').each do |url|
       # check individually since the group would be negated by any one invalid
       # value
       expect(subject).not_to allow_value([url]).for(:redirect_uris)
+      expect(subject.errors[:redirect_uris]).to include("#{url} is not a valid URI")
+    end
+  end
+  it 'correctly validates redirect_uris with wildcards' do
+    %w[https://* https://app.me/*].each do |url|
+      expect(subject).not_to allow_value([url]).for(:redirect_uris)
+      expect(subject.errors[:redirect_uris]).to include("#{url} contains invalid wildcards(*)")
     end
   end
   it { is_expected.to allow_value(*valid_urls, nil).for(:failure_to_proof_url) }
