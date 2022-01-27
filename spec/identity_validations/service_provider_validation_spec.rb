@@ -64,7 +64,7 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
   it { is_expected.to validate_inclusion_of(:ial).in_array([1, 2]).allow_nil }
   it { is_expected.to allow_value((valid_urls << 'random.scheme:'), [], nil).for(:redirect_uris) }
   it 'correctly validates redirect_uris' do
-    (invalid_urls << 'https:').each do |url|
+    (invalid_urls << %w[https: https://* https://app.me/*]).each do |url|
       # check individually since the group would be negated by any one invalid
       # value
       expect(subject).not_to allow_value([url]).for(:redirect_uris)
