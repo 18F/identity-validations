@@ -58,7 +58,7 @@ GEM
       activesupport (>= 4.2.0)
     sqlite3 (1.4.2)
     thread_safe (0.3.6)
-    tzinfo (1.2.7)
+    tzinfo (1.2.10)
       thread_safe (~> 0.1)
     unicode-display_width (1.6.1)
 
