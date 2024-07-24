@@ -1,4 +1,44 @@
-include:
-  project: 'lg/identity-gitlab'
-  ref: 'main'
-  file: '.gitlab-ci-sync.yml'
+# Jobs defined here use the idp/ci docker image from ECR by default. 
+# Images are built via the identity-devops GitLab pipeline.
+
+default:
+  image: 'public.ecr.aws/docker/library/ruby:3.3.1-bullseye'
+
+before_script:
+  - gem install bundler 
+
+.bundle_install: &bundle_install
+  -  bundle install --deployment --jobs=4 --retry=3 --without deploy development production --path vendor/bundle
+ 
+.build_cache:
+  - &ruby_cache
+    key:
+      files:
+        - Gemfile.lock
+    paths:
+      - vendor/bundle
+    policy: pull
+
+stages:
+  - .pre
+  - test
+ 
+install_dependencies:
+  stage: .pre
+  cache:
+    - <<: *ruby_cache
+      policy: pull-push
+  script:
+    - *bundle_install
+
+test_app:
+  stage: test
+  needs:
+    - job: install_dependencies
+  cache:
+    - <<: *ruby_cache
+  script:
+    - *bundle_install
+    - make test
+    - make lint
+
