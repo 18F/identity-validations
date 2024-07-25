@@ -8,7 +8,7 @@ before_script:
   - gem install bundler  
 
 .bundle_install: &bundle_install
-  -  bundle install --deployment --jobs=4 --retry=3 --without deploy development production --path vendor/bundle
+  -   bundle install --retry=3 --path vendor/bundle
  
 .build_cache:
   - &ruby_cache
