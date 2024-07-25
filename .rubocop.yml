@@ -12,7 +12,7 @@ AllCops:
     - 'spec/**/*'
   Exclude:
     - 'bin/**/*'
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 3.3
 
 Metrics/BlockLength:
   CountComments: false  # count full line comments?
