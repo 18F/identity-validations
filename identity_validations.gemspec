@@ -45,5 +45,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop', '=0.75'
   spec.add_development_dependency 'rubocop-rspec'
   spec.add_development_dependency 'shoulda-matchers'
-  spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'sqlite3',"~> 1.4"
 end
