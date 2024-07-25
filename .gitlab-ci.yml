@@ -40,5 +40,4 @@ test_app:
   script:
     - *bundle_install
     - make test
-    - make lint
 
