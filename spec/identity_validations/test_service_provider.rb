@@ -30,7 +30,7 @@ module IdentityValidations
     include IdentityValidations::ServiceProviderValidation
 
     # we need to serialize since SQLite doesn't support arrays
-    serialize :redirect_uris, Array
-    serialize :certs, Array
+    serialize :redirect_uris, type: Array
+    serialize :certs, type: Array
   end
 end
