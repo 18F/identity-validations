@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'openssl'
+require 'active_model'
 
 module IdentityValidations
   # Applies consistent validations to service providers
@@ -12,12 +13,12 @@ module IdentityValidations
         validates :issuer, format: { with: ISSUER_FORMAT_REGEXP }, on: :create
         validates :ial, inclusion: { in: [1, 2] }, allow_nil: true
 
-        validate :redirect_uris_are_valid
-        validate :failure_to_proof_url_is_parsable
-        validate :push_notification_url_is_parsable
-        validate :certs_are_x509_if_present
-        validate :acs_url_is_parsable
-        validate :assertion_consumer_logout_service_url_is_parsable
+        validates :redirect_uris, allow_blank: true,  :'identity_validations/allowed_redirects' => true
+        validates :failure_to_proof_url, allow_blank: true, :'identity_validations/uri' => true
+        validates :push_notification_url, allow_blank: true, :'identity_validations/uri' => true
+        validates :acs_url, allow_blank: true, :'identity_validations/uri' => true
+        validates :assertion_consumer_logout_service_url, allow_blank: true, :'identity_validations/uri' => true
+        validates :certs, allow_blank: true, :'identity_validations/are_x509' => true
       end
     end
 
@@ -29,100 +30,5 @@ module IdentityValidations
     #         However, it was too restrictive for many COTS applications. Now,
     #         we just enforce uniqueness, without whitespace.
     ISSUER_FORMAT_REGEXP = /\A[\S]+\z/.freeze
-
-    def redirect_uris_are_valid
-      return if redirect_uris.blank?
-
-      redirect_uris.each do |uri|
-        errors.add(:redirect_uris, "#{uri} contains invalid wildcards(*)") if uri.include?('*')
-        errors.add(:redirect_uris, "#{uri} is not a valid URI") if !uri_valid?(uri) && !uri_custom_scheme_only?(uri)
-      end
-
-      return errors[:redirect_uris].empty?
-    end
-
-    def failure_to_proof_url_is_parsable
-      return if failure_to_proof_url.blank?
-
-      errors.add(:failure_to_proof_url, :invalid) unless uri_valid?(failure_to_proof_url)
-    end
-
-    def push_notification_url_is_parsable
-      return if push_notification_url.blank?
-
-      errors.add(:push_notification_url, :invalid) unless uri_valid?(push_notification_url)
-    end
-
-    def acs_url_is_parsable
-      return if acs_url.blank? || uri_valid?(acs_url)
-
-      errors.add(:acs_url, :invalid)
-    end
-
-    def assertion_consumer_logout_service_url_is_parsable
-      return if assertion_consumer_logout_service_url.blank? ||
-        uri_valid?(assertion_consumer_logout_service_url)
-
-      errors.add(:assertion_consumer_logout_service_url, :invalid)
-    end
-
-    def certs_are_x509_if_present
-      Array(certs).each do |cert|
-        content = cert_content(cert)
-        next if content.blank?
-
-        OpenSSL::X509::Certificate.new(content)
-      rescue OpenSSL::X509::CertificateError => e
-        errors.add(:certs, "#{cert} is invalid - #{e.message}")
-      end
-    end
-
-    def uri_valid?(uri)
-      parsed_uri = URI.parse(uri)
-      return false if unsupported_uri?(parsed_uri)
-
-      web_uri?(parsed_uri) || native_uri?(parsed_uri) || custom_uri?(parsed_uri)
-    rescue URI::BadURIError, URI::InvalidURIError
-      false
-    end
-
-    def uri_custom_scheme_only?(uri)
-      parsed_uri = URI.parse(uri)
-      return false if unsupported_uri?(parsed_uri)
-      return false if /\Ahttps?/ =~ parsed_uri.scheme
-
-      parsed_uri.scheme.present?
-    rescue URI::BadURIError, URI::InvalidURIError
-      false
-    end
-
-    def unsupported_uri?(uri)
-      !!(/\A(s?ftp|ldaps?|file|mailto)/ =~ uri.scheme)
-    end
-
-    def web_uri?(uri)
-      !!(/\Ahttps?/ =~ uri.scheme && uri.host.present?)
-    end
-
-    # Not a strict definition of native uri, but a catch-all
-    # to ensure we have the bare minimum
-    def native_uri?(uri)
-      uri.scheme.present? && uri.path.present?
-    end
-
-    def custom_uri?(uri)
-      uri.scheme.present? && uri.host.present?
-    end
-
-    def cert_content(cert)
-      all_printable_chars = /\A[[:print:]]+\Z/.match?(cert)
-
-      if all_printable_chars && defined?(Rails)
-        file = Rails.root.join('certs', 'sp', "#{cert}.crt")
-        File.exist?(file) && file.read
-      else
-        cert
-      end
-    end
   end
 end

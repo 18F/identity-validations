@@ -1,7 +1,8 @@
 PATH
   remote: .
   specs:
-    identity_validations (0.7.4)
+    identity_validations (1.0)
+      activemodel (~> 7.1.3)
 
 GEM
   remote: https://rubygems.org/
@@ -87,7 +88,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  activemodel (~> 7.1.3)
   activerecord (~> 7.1.3)
   bundler (>= 2.5)
   byebug

@@ -8,7 +8,8 @@ before_script:
   - gem install bundler  
 
 .bundle_install: &bundle_install
-  -   bundle install --retry=3 --path vendor/bundle
+  - bundle config set path 'vendor/bundle'
+  - bundle install --retry=3
  
 .build_cache:
   - &ruby_cache

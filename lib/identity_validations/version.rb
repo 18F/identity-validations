@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module IdentityValidations
-  VERSION = '0.7.4'
+  VERSION = '1.0'
 end
