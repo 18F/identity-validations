@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'openssl'
-require 'active_model'
 
 module IdentityValidations
   # Applies consistent validations to service providers

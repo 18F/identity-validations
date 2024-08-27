@@ -3,7 +3,6 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'identity_validations/version'
-require 'identity_validations/service_provider_validation'
 
 Gem::Specification.new do |spec|
   spec.name          = 'identity_validations'
