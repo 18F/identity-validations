@@ -1,10 +1,13 @@
 module IdentityValidations
-  class UriValidator < ActiveModel::EachValidator
-    def validate_each(record, attribute, value)
-      record.errors.add(attribute, :invalid) unless uri_valid?(value)
+  class UriValidator < IdentityValidator
+    def validate(record)
+      if attribute.blank?
+        raise ArgumentError, "UriValidator called without an `attribute:` option to validate"
+      end
+      uri = value(record)
+      return if uri.blank?
+      record.errors.add(attribute, :invalid) unless uri_valid?(uri)
     end
-
-    private
 
     def uri_valid?(uri)
       parsed_uri = URI.parse(uri)
@@ -18,6 +21,8 @@ module IdentityValidations
     def unsupported_uri?(uri)
       !!(/\A(s?ftp|ldaps?|file|mailto)/ =~ uri.scheme)
     end
+
+    private
 
     def web_uri?(uri)
       !!(/\Ahttps?/ =~ uri.scheme && uri.host.present?)

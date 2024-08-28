@@ -12,12 +12,12 @@ module IdentityValidations
         validates :issuer, format: { with: ISSUER_FORMAT_REGEXP }, on: :create
         validates :ial, inclusion: { in: [1, 2] }, allow_nil: true
 
-        validates :redirect_uris, allow_blank: true,  :'identity_validations/allowed_redirects' => true
-        validates :failure_to_proof_url, allow_blank: true, :'identity_validations/uri' => true
-        validates :push_notification_url, allow_blank: true, :'identity_validations/uri' => true
-        validates :acs_url, allow_blank: true, :'identity_validations/uri' => true
-        validates :assertion_consumer_logout_service_url, allow_blank: true, :'identity_validations/uri' => true
-        validates :certs, allow_blank: true, :'identity_validations/are_x509' => true
+        validates_with AllowedRedirectsValidator
+        validates_with UriValidator, attribute: :failure_to_proof_url
+        validates_with UriValidator, attribute: :push_notification_url
+        validates_with UriValidator, attribute: :acs_url
+        validates_with UriValidator, attribute: :assertion_consumer_logout_service_url
+        validates_with CertsAreX509Validator
       end
     end
 

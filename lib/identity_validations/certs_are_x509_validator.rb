@@ -1,7 +1,7 @@
 module IdentityValidations
-  class AreX509Validator < ActiveModel::EachValidator
-    def validate_each(record, attribute, values)
-      Array(values).each do |cert|
+  class CertsAreX509Validator < IdentityValidator
+    def validate(record)
+      Array(value(record) || record.certs).each do |cert|
         content = cert_content(cert)
         next if content.blank?
         OpenSSL::X509::Certificate.new(content)
