@@ -4,7 +4,7 @@ module IdentityValidations
       if attribute.blank?
         raise ArgumentError, "UriValidator called without an `attribute:` option to validate"
       end
-      uri = value(record)
+      uri = get_attribute(record)
       return if uri.blank?
       record.errors.add(attribute, :invalid) unless uri_valid?(uri)
     end

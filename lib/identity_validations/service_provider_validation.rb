@@ -4,6 +4,7 @@ require 'openssl'
 
 module IdentityValidations
   # Applies consistent validations to service providers
+  # These validations should be included for any application that validates a service provider record
   module ServiceProviderValidation
     def self.included(base)
       base.class_eval do

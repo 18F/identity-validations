@@ -1,7 +1,8 @@
 module IdentityValidations
   class CertsAreX509Validator < IdentityValidator
     def validate(record)
-      Array(value(record) || record.certs).each do |cert|
+      self.attribute ||= :certs
+      Array(get_attribute(record)).each do |cert|
         content = cert_content(cert)
         next if content.blank?
         OpenSSL::X509::Certificate.new(content)

@@ -1,9 +1,8 @@
 module IdentityValidations
   class AllowedRedirectsValidator < IdentityValidator
     def validate(record)
-      # TODO: refactor. This feels wrong. It's not obivous that `attribute` affects what `value` returns
-      @attribute = attribute || :redirect_uris
-      uris = value(record)
+      self.attribute ||= :redirect_uris
+      uris = get_attribute(record)
 
       return if uris.blank?
       Array(uris).each do |uri_string|
