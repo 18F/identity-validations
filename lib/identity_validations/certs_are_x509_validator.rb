@@ -4,7 +4,9 @@ module IdentityValidations
       self.attribute ||= :certs
       Array(get_attribute(record)).each do |cert|
         content = cert_content(cert)
+
         next if content.blank?
+
         OpenSSL::X509::Certificate.new(content)
       rescue OpenSSL::X509::CertificateError => e
         record.errors.add(:certs, "#{cert} is invalid - #{e.message}")

@@ -5,12 +5,15 @@ module IdentityValidations
         raise ArgumentError, "UriValidator called without an `attribute:` option to validate"
       end
       uri = get_attribute(record)
+
       return if uri.blank?
+
       record.errors.add(attribute, :invalid) unless uri_valid?(uri)
     end
 
     def uri_valid?(uri)
       parsed_uri = URI.parse(uri)
+
       return false if unsupported_uri?(parsed_uri)
 
       web_uri?(parsed_uri) || native_uri?(parsed_uri) || custom_uri?(parsed_uri)
