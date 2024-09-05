@@ -9,7 +9,7 @@ module IdentityValidations
 
         OpenSSL::X509::Certificate.new(content)
       rescue OpenSSL::X509::CertificateError => e
-        record.errors.add(:certs, "#{cert} is invalid - #{e.message}")
+        record.errors.add(attribute, "#{cert} is invalid - #{e.message}")
       end
     end
 
