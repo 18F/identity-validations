@@ -8,7 +8,7 @@ module IdentityValidations
 
       Array(uris).each do |uri_string|
         record.errors.add(attribute, "#{uri_string} contains invalid wildcards(*)") if uri_string.include?('*')
-        record.errors.add(attribute, "#{uri_string} is not a valid URI") if !uri_valid?(uri_string) && !uri_custom_scheme_only?(uri_string)
+        record.errors.add(attribute, "#{uri_string} is not a valid URI") unless uri_valid?(uri_string) || uses_custom_scheme?(uri_string)
       end
     end
 
@@ -22,7 +22,7 @@ module IdentityValidations
       @uri_validator ||= UriValidator.new
     end
 
-    def uri_custom_scheme_only?(uri)
+    def uses_custom_scheme?(uri)
       parsed_uri = URI.parse(uri)
 
       return false if uri_validator.unsupported_uri?(parsed_uri)
