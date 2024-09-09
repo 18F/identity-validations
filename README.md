@@ -28,6 +28,25 @@ class ServiceProvider
 end
 ```
 
+### Secondary Usage
+
+You can also pull in individual validators. To help keep both code and data consistent, please try using the `include` example defined above and use the individual validators only if the `include` above is completely unsuitable for your context. You can use the individual validators like so:
+
+```ruby
+class SetupStep < ActiveRecord::Model
+  validates_with IdentityValidations::UriValidator, attribute: :push_notification_url
+end
+```
+
+These validators accept a custom option, `attribute:` instead of using the Rails `validate :push_notification_url, ...` because that would require applications using this gem to use code like
+
+```ruby
+  # Don't do this. It won't work
+  validate :push_notification_url, allow_blank: true, :'identity_validations/uri' => true
+```
+
+and our concern was it that this would be more confusing when searching through the code. With the working version above, you can search by class name through a variety of repos to get a comprehensive sense of everywhere that the `UriValidator` class is in use.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
