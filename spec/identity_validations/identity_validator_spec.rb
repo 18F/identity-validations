@@ -21,7 +21,7 @@ RSpec.describe IdentityValidations::IdentityValidator do
       end
     end
 
-    it 'throws an error without a bad attribute specified' do
+    it 'throws an error when an invalid attribute is specified' do
       model.an_attribute = "something"
       expect {model.validates_with SimpleValidator, attribute: :invalid_attribute}.
         to raise_error(ArgumentError, "IdentityValidator: attribute 'invalid_attribute' not found in class TestModel")
@@ -29,7 +29,7 @@ RSpec.describe IdentityValidations::IdentityValidator do
 
     it 'will validate when passed an attribute' do
       model.an_attribute = "something"
-      model.validates_with SimpleValidator, attirbute: :an_attribute
+      model.validates_with SimpleValidator, attribute: :an_attribute
       expect(model.errors).to be_blank
       expect(model.errors.messages).to be_blank
     end

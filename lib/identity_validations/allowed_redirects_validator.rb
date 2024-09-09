@@ -7,30 +7,10 @@ module IdentityValidations
       return if uris.blank?
 
       Array(uris).each do |uri_string|
-        record.errors.add(attribute, "#{uri_string} contains invalid wildcards(*)") if uri_string.include?('*')
-        record.errors.add(attribute, "#{uri_string} is not a valid URI") unless uri_valid?(uri_string) || uses_custom_scheme?(uri_string)
+        validating_uri = ValidatingURI.new(uri_string)
+        record.errors.add(attribute, "#{uri_string} contains invalid wildcards(*)") if validating_uri.with_wildcards?
+        record.errors.add(attribute, "#{uri_string} is not a valid URI") unless validating_uri.valid? || validating_uri.custom_scheme?
       end
-    end
-
-    private
-
-    def uri_valid?(uri)
-      uri_validator.uri_valid?(uri)
-    end
-
-    def uri_validator
-      @uri_validator ||= UriValidator.new
-    end
-
-    def uses_custom_scheme?(uri)
-      parsed_uri = URI.parse(uri)
-
-      return false if uri_validator.unsupported_uri?(parsed_uri)
-      return false if /\Ahttps?/ =~ parsed_uri.scheme
-
-      parsed_uri.scheme.present?
-    rescue URI::BadURIError, URI::InvalidURIError
-      false
     end
   end
 end

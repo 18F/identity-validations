@@ -10,9 +10,16 @@ RSpec.describe IdentityValidations::IdentityValidator do
 
   let(:model) { TestModel.new }
 
-  it 'allows blank' do
+  it 'allows nil' do
+    expect(model.test_url).to be_nil
     model.validates_with IdentityValidations::UriValidator, attribute: :test_url
+    expect(model.errors).to be_blank
+    expect(model.errors.messages).to be_blank
+  end
+
+  it 'allows blank' do
     model.test_url = ''
+    model.validates_with IdentityValidations::UriValidator, attribute: :test_url
     expect(model.errors).to be_blank
     expect(model.errors.messages).to be_blank
   end
