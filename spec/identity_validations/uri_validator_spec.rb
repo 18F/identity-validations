@@ -38,6 +38,13 @@ RSpec.describe IdentityValidations::IdentityValidator do
     expect(model.errors.messages).to eq({test_url: ['is invalid']})
   end
 
+  it 'rejects a malformed "mailto:" URL' do
+    model.test_url = 'mailto:/'
+    model.validates_with IdentityValidations::UriValidator, attribute: :test_url
+    expect(model.errors).to_not be_blank
+    expect(model.errors.messages).to eq({test_url: ['is invalid']})
+  end
+
   it 'raises an error if the attribute is not specified' do
     expect {model.validates_with IdentityValidations::UriValidator}.
       to raise_error(ArgumentError, 'UriValidator called without an `attribute:` option to validate')

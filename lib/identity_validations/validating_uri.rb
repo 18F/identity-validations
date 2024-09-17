@@ -6,7 +6,7 @@ module IdentityValidations
     def initialize(string)
       @uri = URI.parse(string)
       @did_parse = true
-    rescue URI::BadURIError, URI::InvalidURIError
+    rescue URI::Error
       @did_parse = false
     end
 

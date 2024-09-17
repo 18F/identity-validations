@@ -81,4 +81,30 @@ RSpec.describe IdentityValidations::ValidatingURI do
     it { should be_custom }
     it { should be_native }
   end
+
+  describe 'well-formed "mailto:" url' do
+    let(:test_url) { 'mailto:do-not-reply@localhost.localdomain' }
+
+    it { should be_parseable }
+    it { should_not be_valid}
+    it { should be_unsupported }
+    it { should_not be_web }
+    it { should_not be_with_wildcards }
+    it { should_not be_custom_scheme }
+    it { should_not be_custom }
+    it { should_not be_native }
+  end
+
+  describe 'malformed "mailto:" url' do
+    let(:test_url) { 'mailto:/' }
+
+    it { should_not be_parseable }
+    it { should_not be_valid}
+    it { should be_unsupported }
+    it { should_not be_web }
+    it { should_not be_with_wildcards }
+    it { should_not be_custom_scheme }
+    it { should_not be_custom }
+    it { should_not be_native }
+  end
 end
