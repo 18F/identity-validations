@@ -18,6 +18,7 @@ ActiveRecord::Schema.define do
     t.integer 'ial'
     t.string 'redirect_uris'
     t.text 'failure_to_proof_url'
+    t.string 'post_idv_follow_up_url'
     t.string 'push_notification_url'
     t.string 'certs'
     t.string 'acs_url'

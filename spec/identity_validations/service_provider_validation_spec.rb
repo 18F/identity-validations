@@ -79,6 +79,8 @@ RSpec.describe IdentityValidations::ServiceProviderValidation, type: :model do
   end
   it { is_expected.to allow_value(*valid_urls, nil).for(:failure_to_proof_url) }
   it { is_expected.not_to allow_value(*invalid_urls).for(:failure_to_proof_url) }
+  it { is_expected.to allow_value(*valid_urls, nil).for(:post_idv_follow_up_url) }
+  it { is_expected.not_to allow_value(*invalid_urls).for(:post_idv_follow_up_url) }
   it { is_expected.to allow_value(*valid_urls, nil).for(:push_notification_url) }
   it { is_expected.not_to allow_value(*invalid_urls).for(:push_notification_url) }
   it { is_expected.to allow_value(*valid_urls, nil).for(:acs_url) }

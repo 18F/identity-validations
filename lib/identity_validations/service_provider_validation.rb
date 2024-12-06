@@ -15,6 +15,7 @@ module IdentityValidations
 
         validates_with AllowedRedirectsValidator
         validates_with UriValidator, attribute: :failure_to_proof_url
+        validates_with UriValidator, attribute: :post_idv_follow_up_url
         validates_with UriValidator, attribute: :push_notification_url
         validates_with UriValidator, attribute: :acs_url
         validates_with UriValidator, attribute: :assertion_consumer_logout_service_url
